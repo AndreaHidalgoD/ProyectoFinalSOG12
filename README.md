@@ -1,4 +1,1 @@
-README VERSION 4
-
-Manager: Andrea otra vez 
-verificada por Mireia
+Versión 5 generada por Andrea

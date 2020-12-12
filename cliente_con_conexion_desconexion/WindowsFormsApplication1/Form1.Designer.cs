@@ -317,7 +317,7 @@
             this.contSer.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.contSer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.contSer.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.contSer.Location = new System.Drawing.Point(377, 501);
+            this.contSer.Location = new System.Drawing.Point(484, 574);
             this.contSer.Name = "contSer";
             this.contSer.Size = new System.Drawing.Size(224, 122);
             this.contSer.TabIndex = 27;
@@ -399,6 +399,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

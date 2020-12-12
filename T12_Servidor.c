@@ -19,12 +19,13 @@ int sockets[100];
 typedef struct {
 	char nombre [20];
 	int socket;
+	int idPartida;
 }Conectado;
 
 typedef struct{
 	Conectado conectados [100];
 	int num;
-	int idPartida;
+	
 } ListaConectados;
 
 ListaConectados miLista;
@@ -159,8 +160,9 @@ int BuscaridPartida ()
 	MYSQL_RES *resultado;
 	MYSQL_ROW row;
 	
-	strcpy (consulta,"SELECT PARTIDA.ID FROM(PARTIDA)"); 
 	
+	strcpy (consulta,"SELECT MAX(PARTIDA.ID) FROM(PARTIDA)"); 
+	printf("La consulta es %s\n", consulta);
 	// hacemos la consulta 
 	err=mysql_query (conn, consulta); 
 	if (err!=0) {
@@ -172,18 +174,69 @@ int BuscaridPartida ()
 	resultado = mysql_store_result (conn); 
 	row = mysql_fetch_row (resultado);
 	
-
+	if (row==NULL)
+	{
+		return idPartida;
+	}
+	else
+	{
+		printf("La fila es %s\n", row[0]);
+		idPartida=atoi(row[0])+1;
+		printf("Idpartida es %d\n",idPartida);
 		
+		return idPartida;
+	}
+	/*	
 	while (row!=NULL)
 	{
 		idPartida=idPartida+1;
 			
 		row = mysql_fetch_row (resultado);
 	}
-	return idPartida;
+	return idPartida;*/
 	
 }
-
+void AddBBDDConnector(int idPartida, char nombre[20])
+{
+	char consulta [512];
+	
+	int err;
+	MYSQL_RES *resultado;
+	MYSQL_ROW row;
+	
+	sprintf(consulta,"INSERT INTO CONNECTOR VALUES('%s', %d)",nombre, idPartida); 
+	
+	// hacemos la consulta 
+	err=mysql_query (conn, consulta); 
+	if (err!=0) {
+		printf ("Error al consultar datos de la base %u %s\n",
+				mysql_errno(conn), mysql_error(conn));
+		exit (1);
+	}
+	//recogemos el resultado de la consulta 
+	//resultado = mysql_store_result (conn); 
+	//row = mysql_fetch_row (resultado);
+	
+}
+void AddBBDDPartida(int idPartida, char data[20])
+{
+	char consulta [512];
+	int err;
+	
+	MYSQL_RES *resultado;
+	MYSQL_ROW row;
+	//S'ha de canviar el temps
+	sprintf(consulta,"INSERT INTO PARTIDA VALUES(%d,'%s',10000);",idPartida, data); 
+	
+	// hacemos la consulta 
+	err=mysql_query (conn, consulta); 
+	if (err!=0) {
+		printf ("Error al consultar datos de la base %u %s\n",
+				mysql_errno(conn), mysql_error(conn));
+		exit (1);
+	}
+	
+}
 
 //Devolver 0, 1 -1
 int LogIn ( char nombre[20], char contrasenya [20], int sock_conn)
@@ -404,7 +457,8 @@ void *AtenderCliente (void *socket)
 		exit (1);
 	}
 	//inicializar la conexion
-	conn = mysql_real_connect (conn, "localhost","root", "mysql", "db",0, NULL, 0);
+	//Preguntar BBDD Miguel directorio
+	conn = mysql_real_connect (conn, "localhost","root", "mysql", "BBDDdb",0, NULL, 0);
 	if (conn==NULL) {
 		printf ("Error al inicializar la conexion: %u %s\n", mysql_errno(conn), mysql_error(conn));
 		exit (1);
@@ -446,7 +500,7 @@ void *AtenderCliente (void *socket)
 		printf("numero de codigo %d\n",codigo);
 		// Ya tenemos el c?digo de la petici?n
 		char nombre[20];
-		if ( codigo!=3 && codigo!=0 && codigo!=6 && codigo!=8 && codigo !=9 && codigo!=11)
+		if ( codigo!=3 && codigo!=0 && codigo!=6 && codigo!=8 && codigo !=9 && codigo!=11&& codigo!=12)
 		{
 			printf("entro codigo dif0\n");
 			p = strtok( NULL, "/"); //segundo trozo
@@ -643,22 +697,41 @@ void *AtenderCliente (void *socket)
 		}
 		else if (codigo==11)
 		{
-		
+			char aceptado[20];
 			p = strtok( NULL, "/");
 			
-			strcpy (nombre, p);
-			printf("La partida ha sido: %s\n", nombre);
+			strcpy (aceptado, p); //Aceptado
+			p = strtok( NULL, "/");
+			strcpy(nombre, p); //Nombre host
+			printf("%s, la partida ha sido: %s \n", nombre,aceptado);
+			int idPartida;
+			int posicion;
 			
 			char notificacion[20];
-			sprintf(notificacion,"5/%s", nombre);
-			write(sock_conn, notificacion, strlen(notificacion));
-
+			if (strcmp(aceptado,"aceptado")==0)
+			{
+				
+				idPartida=BuscaridPartida();
+				posicion=DamePosicion(&miLista,nombre);
+				miLista.conectados[posicion].idPartida=idPartida;
+				AddBBDDPartida(idPartida, "9.9.9999");
+				AddBBDDConnector(idPartida, nombre);
+				sprintf(notificacion,"5/%s/%d", aceptado, idPartida);
+			}
+			else
+			{
+				sprintf(notificacion,"5/%s", aceptado);
 			
+			}
+			write(sock_conn, notificacion, strlen(notificacion));
+		
 			p=strtok(NULL, "/");
 			int contador=atoi(p);
 			printf("El contador vale: %d\n", contador);
-
+			
+			
 			char invitado [20];
+		
 
 			int j;
 			
@@ -666,6 +739,17 @@ void *AtenderCliente (void *socket)
 			{
 				p = strtok( NULL, "/"); 
 				strcpy (invitado, p);
+				printf("El invitado es %s\n", invitado);
+				if (strcmp(aceptado,"aceptado")==0)
+				{
+					pthread_mutex_lock( &mutex ) ; 
+					posicion=DamePosicion(&miLista,invitado);
+					miLista.conectados[posicion].idPartida=idPartida;
+					pthread_mutex_unlock( &mutex ) ; 
+					printf("El idPartida de %s es %d\n", nombre, idPartida);
+					AddBBDDConnector(idPartida, invitado);
+				}
+				
 				printf("Entro en el for del codigo 11\n");
 				socket=DameSocket(&miLista,invitado);
 				printf("Envio codigo 5 al socket: %d\n",socket);
@@ -675,7 +759,35 @@ void *AtenderCliente (void *socket)
 			}
 			
 		}
-		if ((codigo != 0) && (codigo != 9)&&(codigo!=10)&& (codigo!=11))
+		else if (codigo==12)
+		{
+			printf("Entro en el codigo 12\n");
+			int idPartida;
+			p=strtok(NULL, "/");
+			idPartida=atoi(p);
+			
+			char mensaje[120];
+			p=strtok(NULL, "/");
+			strcpy(mensaje,p);
+			
+			char notificacion[120];
+			sprintf(notificacion,"7/%s", mensaje);
+			int j;
+			for (j=0;j<miLista.num;j++)
+			{
+				printf("Entro dentro del for del chat\n");
+				printf("12 El idPartida de %s es %d\n", miLista.conectados[j].nombre, miLista.conectados[j].idPartida);
+				if (miLista.conectados[j].idPartida==idPartida)
+				{
+					printf("Encuentro conectado\n");
+					socket=DameSocket(&miLista, miLista.conectados[j].nombre);
+					
+					write(socket, notificacion, strlen(notificacion));
+					
+				}
+			}
+		}
+		if ((codigo != 0) && (codigo != 9)&&(codigo!=10)&& (codigo!=11)&&(codigo!=12))
 		{
 			
 			//Envia el mensaje a mi consola en C#
@@ -749,7 +861,7 @@ void *AtenderCliente (void *socket)
 int main (int argc, char *argv[]) 
 {
 	miLista.num=0; 
-	int puerto=9227; //50085, 50086, 50087
+	int puerto=9248; //50085, 50086, 50087
 	// CONECTAR SERVIDOR-CLIENT
 	int sock_conn, sock_listen, ret;
 	struct sockaddr_in serv_adr;

@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.label1 = new System.Windows.Forms.Label();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -53,7 +52,9 @@
             this.button1 = new System.Windows.Forms.Button();
             this.Vermella = new System.Windows.Forms.Button();
             this.buttonG1 = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.textBoxChat = new System.Windows.Forms.TextBox();
+            this.buttonChat = new System.Windows.Forms.Button();
+            this.ChatTextBox = new System.Windows.Forms.RichTextBox();
             this.Mapa.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,16 +67,6 @@
             this.label1.Size = new System.Drawing.Size(154, 17);
             this.label1.TabIndex = 1;
             this.label1.Text = "Lista de conectados";
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.AllowUserToOrderColumns = true;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(12, 76);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(250, 254);
-            this.dataGridView1.TabIndex = 2;
             // 
             // label2
             // 
@@ -313,23 +304,51 @@
             this.buttonG1.UseVisualStyleBackColor = true;
             this.buttonG1.Click += new System.EventHandler(this.buttonG1_Click);
             // 
+            // textBoxChat
+            // 
+            this.textBoxChat.Location = new System.Drawing.Point(14, 318);
+            this.textBoxChat.Name = "textBoxChat";
+            this.textBoxChat.Size = new System.Drawing.Size(207, 22);
+            this.textBoxChat.TabIndex = 29;
+            this.textBoxChat.TextChanged += new System.EventHandler(this.textBoxChat_TextChanged);
+            // 
+            // buttonChat
+            // 
+            this.buttonChat.Location = new System.Drawing.Point(227, 318);
+            this.buttonChat.Name = "buttonChat";
+            this.buttonChat.Size = new System.Drawing.Size(63, 29);
+            this.buttonChat.TabIndex = 30;
+            this.buttonChat.Text = "Enviar";
+            this.buttonChat.UseVisualStyleBackColor = true;
+            this.buttonChat.Click += new System.EventHandler(this.buttonChat_Click);
+            // 
+            // ChatTextBox
+            // 
+            this.ChatTextBox.Location = new System.Drawing.Point(12, 60);
+            this.ChatTextBox.Name = "ChatTextBox";
+            this.ChatTextBox.Size = new System.Drawing.Size(266, 252);
+            this.ChatTextBox.TabIndex = 32;
+            this.ChatTextBox.Text = "";
+            // 
             // MapaJuego
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.ClientSize = new System.Drawing.Size(1043, 517);
+            this.Controls.Add(this.ChatTextBox);
+            this.Controls.Add(this.buttonChat);
+            this.Controls.Add(this.textBoxChat);
             this.Controls.Add(this.button7);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Mapa);
             this.Name = "MapaJuego";
             this.Text = "MapaJuego";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MapaJuego_FormClosing);
             this.Load += new System.EventHandler(this.MapaJuego_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.Mapa.ResumeLayout(false);
             this.Mapa.PerformLayout();
             this.ResumeLayout(false);
@@ -357,11 +376,13 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.TextBox textBoxChat;
+        private System.Windows.Forms.Button buttonChat;
+        private System.Windows.Forms.RichTextBox ChatTextBox;
     }
 }
