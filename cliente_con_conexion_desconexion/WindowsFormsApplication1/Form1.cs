@@ -20,22 +20,28 @@ namespace WindowsFormsApplication1
         Thread atender;
         Funciones funciones = new Funciones();
         string Nombre;
-        string ip= "192.168.56.102";
-        int puerto = 9227;
+        string ip = "147.83.117.22";
+        int puerto = 50085;
         string huesped;
+        int idPartida;
         int contInvitados = 0;
         int contRespuestas = 0;
         int contAceptadas = 0;
         string broadcast;
         string ListaInvitados = "";
+        delegate void DelegadoParaEscribir(string mensaje);
+        delegate void DelegadoDataGrid1(string [] trozos);
+        delegate void DelegadoJugar(string mensaje);
+        MapaJuego formMapa;
        
        
         public Form1()
         {
             InitializeComponent();
-            CheckForIllegalCrossThreadCalls = false; //Necesario para que los elementos de los formularios puedan ser
+            //CheckForIllegalCrossThreadCalls = false; //Necesario para que los elementos de los formularios puedan ser
             //accedidos desde threads difetentes a los que los crearon
         }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -59,14 +65,46 @@ namespace WindowsFormsApplication1
 
 
         }
+        public void PonContador(string counter)
+        {
+            contSer.Text = counter;
+        }
+        public void FuncDataGrid(string [] trozos)
+        {
+            //Recibimos mensaje del servidor
+            //byte[] msg2 = new byte[80];
+            //server.Receive(msg2);
+            //string[] trozos;
+            //string mensaje = mensaje = trozos[0].Split('\0')[0];
+           
+            //dataGridView2.Rows.Clear();
 
+            dataGridView2.Rows.Clear();
+            int i = 1;
+            while (i <= Convert.ToInt32(trozos[1]))
+            {
+
+                dataGridView2.Rows.Add(trozos[i + 1]);
+                i = i + 1;
+
+            }
+        }
+        public void QuieresJugar(string mensaje)
+        {
+            textBoxNom.Visible = true;
+            buttonAceptarF1.Visible = true;
+            buttonRechazarF1.Visible = true;
+            textBoxNom.Text = "¿Quieres aceptar la invitación de " + mensaje + "?";
+        }
+
+      
          private void AtenderServidor()
         {
             //try
             //{
             int codigo;
             string mensaje;
-            
+         
 
                 while (true)
                 {   
@@ -97,54 +135,31 @@ namespace WindowsFormsApplication1
 
                                 MessageBox.Show(mensaje);
                                 break;
-                            case 6: //ListaConectados
 
-                                int i = 1;
-                                dataGridView2.Rows.Clear();
-                                while (i <= Convert.ToInt32(trozos[1]))
-                                {
-                                    dataGridView2.Rows.Add(trozos[i + 1]);
-                                    i = i + 1;
-
-                                }
-                                break;
-                            case 8: //Recibimos notificación
-
-                                contSer.Text = mensaje;
-                                break;
-                            case 9:
-                                textBoxNom.Visible = true;
-                                buttonAceptarF1.Visible = true;
-                                buttonRechazarF1.Visible = true;
-                                textBoxNom.Text = "¿Quieres aceptar la invitación de " + mensaje + "?";
-                                huesped = mensaje;
-                                /* Invitacion form = new Invitacion();
-
-                                 form.TomarNombre(mensaje);
-                                 form.ShowDialog();
-                                 this.Close();
-                                 MessageBox.Show(Convert.ToString(aceptado));*/
-
-                                break;
                             case 4:
                                 if (mensaje == "aceptado")
                                 {
-                                    
+
                                     contAceptadas = contAceptadas + 1;
                                     contRespuestas = contRespuestas + 1;
                                 }
                                 else
                                     contRespuestas = contRespuestas + 1;
-                                MessageBox.Show(trozos[2]+" ha "+mensaje+" jugar tu partida");
-                               
+                                MessageBox.Show(trozos[2] + " ha " + mensaje + " jugar tu partida");
+
                                 break;
                             case 5:
                                 if (mensaje == "aceptado")
                                 {
 
-                                    MessageBox.Show("Damos comienzo a la partida, todos han aceptado jugar. Prepárate "+ Nombre);
-                                    MapaJuego form = new MapaJuego();
-                                    form.ShowDialog();
+                                    MessageBox.Show("Damos comienzo a la partida con ID "+ trozos[2] +", todos han aceptado jugar. Prepárate " + Nombre);
+                                    idPartida = Convert.ToInt32(trozos[2]);
+                                    
+                                    ThreadStart ts = delegate { PonerEnMarchaMapa(); };
+                                    Thread T = new Thread(ts);
+                                    T.Start();
+                                    //this.Close();
+                                    
                                     contAceptadas = 0;
                                     contRespuestas = 0;
                                     contInvitados = 0;
@@ -154,13 +169,50 @@ namespace WindowsFormsApplication1
                                 else
                                 {
                                     MessageBox.Show("No habéis aceptado todos la partida, no se puede jugar. Lo sentimos " + Nombre);
-                                    
-                                   
+
+
                                 }
                                 break;
+                            
+                            case 6: //ListaConectados
+                                DelegadoDataGrid1 delegado1= new DelegadoDataGrid1(FuncDataGrid);
+                                dataGridView2.Invoke(delegado1,new object [] {trozos});
+                                
+                                /*dataGridView2.Rows.Clear();
+                                int i=1;
+                                while (i <= Convert.ToInt32(trozos[1]))
+                                {
+                                    
+                                    dataGridView2.Rows.Add(trozos[i + 1]);
+                                    i = i + 1;
 
+                                }*/
+                                break;
+                            case 7: //Chat
+                                
+                                formMapa.RecibirMensaje(mensaje);
+                                break;
+                            case 8: //Recibimos notificación
 
+                                //contSer.Text = mensaje;
+                                DelegadoParaEscribir delegado = new DelegadoParaEscribir(PonContador);
+                                contSer.Invoke(delegado, new object[] {mensaje});
+                                break;
+                            case 9:
+                                
+                                
+                                //textBoxNom.Text = "¿Quieres aceptar la invitación de " + mensaje + "?";
+                                DelegadoJugar delegado2 = new DelegadoJugar(QuieresJugar);
+                                textBoxNom.Invoke(delegado2, new object[] { mensaje });
+                                huesped = mensaje;
+                                /* Invitacion form = new Invitacion();
 
+                                 form.TomarNombre(mensaje);
+                                 form.ShowDialog();
+                                 this.Close();
+                                 MessageBox.Show(Convert.ToString(aceptado));*/
+
+                                break;
                               
                         }
                         if ((contRespuestas == contInvitados)&&(contInvitados!=0))
@@ -181,7 +233,7 @@ namespace WindowsFormsApplication1
                                 MessageBox.Show( "No habéis aceptado todos la partida, no se puede jugar. Lo sentimos " + Nombre);
                             }
                             // Enviamos al servidor el mensaje broadcast
-                            broadcast = "11/" + broadcast+"/"+Convert.ToString(contInvitados)+ListaInvitados;
+                            broadcast = "11/" + broadcast+"/"+Nombre+"/"+Convert.ToString(contInvitados)+ListaInvitados;
                             byte[] msg = System.Text.Encoding.ASCII.GetBytes(broadcast);
                             server.Send(msg);
                             
@@ -443,12 +495,18 @@ namespace WindowsFormsApplication1
         }
 
 
-
+        private void PonerEnMarchaMapa()
+        {
+            MapaJuego form = new MapaJuego(Nombre, server, idPartida);
+            formMapa = form;
+            form.ShowDialog();
+        }
         private void Enter_Click(object sender, EventArgs e)
         {
-            MapaJuego form = new MapaJuego();
-            form.ShowDialog();
-            this.Close();
+            ThreadStart ts = delegate {PonerEnMarchaMapa();};
+            Thread T= new Thread(ts);
+            T.Start();
+            //this.Close();
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -467,26 +525,49 @@ namespace WindowsFormsApplication1
             string mensaje="9/" + Nombre +"/";
             string mensaje2 = "";
             int contador = 0;
-            while (i < dataGridView2.RowCount)
+            bool encontrado = false ;
+            string NombreComparar;
+            //string mensaje = mensaje = trozos[0].Split('\0')[0];
+            while ((i < dataGridView2.RowCount) && (encontrado==false))
             {
-                if (dataGridView2.Rows[i].Cells[0].Selected == true)
-                {
-                    mensaje2 = mensaje2 + "/" + Convert.ToString(dataGridView2.Rows[i].Cells[0].Value);
-                    
-                    contador = contador + 1;
+              
+                    if (dataGridView2.Rows[i].Cells[0].Selected == true)
+                    {
+                        NombreComparar=Convert.ToString(dataGridView2.Rows[i].Cells[0].Value).Split('\0')[0];
+                        if (NombreComparar==Nombre)
+                        {
+                            encontrado=true;
+                        }
+                        else
+                        {
+                            mensaje2 = mensaje2 + "/" + Convert.ToString(dataGridView2.Rows[i].Cells[0].Value);
 
-                }
-                
-                i = i + 1;
+                            contador = contador + 1;
+                        }
+
+                    }
+
+                    i = i + 1;
                 
 
             }
-            contInvitados = contador;
-            ListaInvitados = mensaje2;
+            if (encontrado == true)
+            {
+                MessageBox.Show("No puedes enviarte una solicitud a ti mismo");
+                contador = 0;
+                mensaje2 = "";
+            }
+            else
+            {
+                
+                contInvitados = contador;
+                ListaInvitados = mensaje2;
 
-            mensaje = mensaje + Convert.ToString(contador)+mensaje2;
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
-            server.Send(msg);
+                mensaje = mensaje + Convert.ToString(contador) + mensaje2;
+                byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+                server.Send(msg);
+                MessageBox.Show("Se ha enviado tu solicitud correctamente");
+            }
             //MessageBox.Show(mensaje);
 
         }
@@ -512,6 +593,31 @@ namespace WindowsFormsApplication1
             textBoxNom.Visible = false;
             buttonAceptarF1.Visible = false;
             buttonRechazarF1.Visible = false;
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //Mensaje de desconexión
+            string mensaje = "7/" + Nombre;
+
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(mensaje);
+            server.Send(msg);
+
+            // Nos desconectamos
+            atender.Abort();
+            this.BackColor = Color.Gray;
+            server.Shutdown(SocketShutdown.Both);
+            server.Close();
+
+
+            //funciones.Desconnectar(server);
+            this.BackColor = Color.Gray;
+            groupBox1.Visible = false;
+            groupBox2.Visible = true;
+            button3.Visible = false;
+            //Servicios.Visible = false;
+            contSer.Visible = false;
+            dataGridView2.Visible = false;
         }
         //bool aceptado;
         /*public void AceptarPartida(bool aceptado)
