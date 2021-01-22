@@ -11,9 +11,29 @@ namespace WindowsFormsApplication1
 {
     public partial class Vermella : Form
     {
+        int minutos =0;
+        int segundos=0;
         public Vermella()
         {
             InitializeComponent();
+            //Només que obri la pestanya comença el timer
+            timer1.Interval = 1000; //1s
+            timer1.Start();
+        }
+        private void Timer1_Tick(object sender, EventArgs e)
+        {
+            if (segundos>=60)
+            {
+                minutos=minutos+1;
+                segundos=0;
+            }
+            label3.Text="Minutos:" + Convert.ToString(minutos)+", segundos: "+ Convert.ToString(segundos);
+            if (minutos >= 3)
+            {
+                timer1.Stop();
+                MessageBox.Show("Has acabado tu tiempo");
+                this.Close();
+            }
         }
 
         private void TaulaPeriodica_Click(object sender, EventArgs e)

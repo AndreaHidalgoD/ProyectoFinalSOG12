@@ -37,8 +37,7 @@ namespace WindowsFormsApplication1
             this.mensaje = mensaje;
             DelegadoChat delegadochat = new DelegadoChat(Chatear);
             ChatTextBox.Invoke(delegadochat, new object[] { mensaje });
-            
-            
+             
         }
 
 
@@ -114,6 +113,18 @@ namespace WindowsFormsApplication1
         private void ChatTextBox_TextChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            SalaActos form = new SalaActos();
+            form.ShowDialog();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Blau1_Instruccions form = new Blau1_Instruccions();
+            form.ShowDialog();
         }
 
         

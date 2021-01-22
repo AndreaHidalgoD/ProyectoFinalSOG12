@@ -20,8 +20,8 @@ namespace WindowsFormsApplication1
         Thread atender;
         Funciones funciones = new Funciones();
         string Nombre;
-        string ip = "147.83.117.22";
-        int puerto = 50085;
+        string ip = "192.168.56.101";
+        int puerto = 9248;
         string huesped;
         int idPartida;
         int contInvitados = 0;
@@ -100,8 +100,6 @@ namespace WindowsFormsApplication1
       
          private void AtenderServidor()
         {
-            //try
-            //{
             int codigo;
             string mensaje;
          
@@ -170,7 +168,6 @@ namespace WindowsFormsApplication1
                                 {
                                     MessageBox.Show("No habéis aceptado todos la partida, no se puede jugar. Lo sentimos " + Nombre);
 
-
                                 }
                                 break;
                             
@@ -199,8 +196,6 @@ namespace WindowsFormsApplication1
                                 contSer.Invoke(delegado, new object[] {mensaje});
                                 break;
                             case 9:
-                                
-                                
                                 //textBoxNom.Text = "¿Quieres aceptar la invitación de " + mensaje + "?";
                                 DelegadoJugar delegado2 = new DelegadoJugar(QuieresJugar);
                                 textBoxNom.Invoke(delegado2, new object[] { mensaje });
@@ -379,6 +374,10 @@ namespace WindowsFormsApplication1
                         contSer.Visible = true;
                         Nombre = UsuariLogIn.Text;
                     }
+                    else if (mensaje == "YACONECTADO")
+                    {
+                        MessageBox.Show("Este usuario ya esta conectado");
+                    }
 
                     else
                         MessageBox.Show("La contraseña introducida es incorrecta");
@@ -391,10 +390,6 @@ namespace WindowsFormsApplication1
                     return;
 
                 }
-            
-
-            
-
             
         }
 
@@ -619,6 +614,7 @@ namespace WindowsFormsApplication1
             contSer.Visible = false;
             dataGridView2.Visible = false;
         }
+
         //bool aceptado;
         /*public void AceptarPartida(bool aceptado)
         {

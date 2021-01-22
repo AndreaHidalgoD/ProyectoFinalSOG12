@@ -159,6 +159,7 @@
             this.button5.TabIndex = 13;
             this.button5.Text = "ENTRAR";
             this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // textBox6
             // 
@@ -224,6 +225,7 @@
             this.button2.TabIndex = 7;
             this.button2.Text = "ENTRAR";
             this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // textBox3
             // 

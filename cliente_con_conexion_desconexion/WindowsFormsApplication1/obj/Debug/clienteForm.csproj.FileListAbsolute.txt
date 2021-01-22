@@ -215,3 +215,6 @@ C:\share\ProyectoSOG12\cliente_con_conexion_desconexion\WindowsFormsApplication1
 C:\share\ProyectoSOG12\cliente_con_conexion_desconexion\WindowsFormsApplication1\obj\Debug\clienteForm.csproj.GenerateResource.Cache
 C:\Users\andbj\Desktop\GitHub\ProyectoFinalSOG12\cliente_con_conexion_desconexion\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.exe
 C:\Users\andbj\Desktop\GitHub\ProyectoFinalSOG12\cliente_con_conexion_desconexion\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.pdb
+C:\Users\aidap\OneDrive\Escritorio\Universitat\3r any\1r quatrimestre\SO\Carpeta conectada a github\ProyectoFinalSOG12\ProyectoFinalSOG12\cliente_con_conexion_desconexion\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.exe
+C:\Users\aidap\OneDrive\Escritorio\Universitat\3r any\1r quatrimestre\SO\Carpeta conectada a github\ProyectoFinalSOG12\ProyectoFinalSOG12\cliente_con_conexion_desconexion\WindowsFormsApplication1\obj\Debug\WindowsFormsApplication1.pdb
+C:\Users\aidap\OneDrive\Escritorio\Universitat\3r any\1r quatrimestre\SO\Carpeta conectada a github\ProyectoFinalSOG12\ProyectoFinalSOG12\cliente_con_conexion_desconexion\WindowsFormsApplication1\obj\Debug\clienteForm.csprojResolveAssemblyReference.cache
